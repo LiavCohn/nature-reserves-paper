@@ -1,2 +1,2 @@
 # nature-reserves-paper
-# working Aviv Sar-Shalom
+# by Aviv Sar-Shalom & Liav Cohn
