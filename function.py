@@ -1,5 +1,6 @@
 import calendar
 import pandas as pd
+import numpy as np
 
 def remove_high_corr(df,target='Israelis_Count',threshold=0.5):
   '''
@@ -10,9 +11,6 @@ def remove_high_corr(df,target='Israelis_Count',threshold=0.5):
   target = string of the target
   threshold = default 0.5
   '''
-  import pandas as pd
-  import numpy as np
-
   target_col = df.pop(target)
   df.insert(len(df.columns), target, target_col)
   cor_matrix = df.corr().abs()
@@ -271,3 +269,70 @@ def printOutputeCoef(coef):
   for tup in coef:
       d[tup[-1]] = tup[0]
   return pd.DataFrame.from_dict(d,orient='index')
+
+
+
+
+
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MinMaxScaler
+from sklearn import linear_model
+def mlrModelResTrainTestCoeff(dataframe,shaffle=False):
+    '''
+    return 3 df: train result, test results, coeff results. 
+    get df as data, with Data columns!.
+    '''
+    dataframe.dropna(inplace=True)
+    dataframe.sort_values('Date')
+    y = dataframe[['Date','Israelis_Count']]
+    X = dataframe.drop('Israelis_Count',axis=1)
+    
+    X_train, X_test, y_train, y_test = train_test_split(X, y, shuffle=shaffle, test_size = 0.2)
+
+    X_train_scaler = MinMaxScaler()
+    X_test_scaler = MinMaxScaler()
+
+    X_train_scaled = X_train_scaler.fit_transform(X_train.drop('Date',axis=1))
+    X_test_scaled = X_test_scaler.fit_transform(X_test.drop('Date',axis=1))
+    
+    mlr = linear_model.LinearRegression()
+    mlr.fit(X_train_scaled,y_train.Israelis_Count)
+    
+    prediction = mlr.predict(X_train_scaled)
+    resTrain =  pd.DataFrame(
+        data={
+            'Prediction':prediction,
+            'Actual': y_train.Israelis_Count.values    },
+        index=y_train.Date
+    )
+    
+    prediction = mlr.predict(X_test_scaled)
+    resTest = pd.DataFrame(
+        data={
+            'Prediction':prediction,
+            'Actual': y_test.Israelis_Count.values    },
+        index=y_test.Date
+    )
+    coef = sorted( list(zip(np.round(mlr.coef_,5).T,X_train.drop("Date",axis=1).columns)))
+    d = {}
+    for tup in coef:
+        d[tup[-1]] = tup[0]
+    coefDF = pd.DataFrame.from_dict(d,orient='index')
+    
+    return resTrain,resTest,coefDF
+    
+def printRes(res ,plotLine=True ,plotResiduals = False, n = 10):
+    '''
+    print results from df reuslts and n samples 
+    '''
+    res = res.sort_index()
+    print('rmse',get_rmse(res.Prediction, res.Actual))
+    print('std',np.std(res.Actual))
+    
+    if plotResiduals:
+        plot_residuals(actual=res.Actual,prediction=res.Prediction)
+    if plotLine:
+        plot_line(actual=res.Actual,prediction=res.Prediction)
+        
+    print('Sample rows:')
+    print( res.sample(n))
