@@ -26,9 +26,8 @@ legend_html = '''
 <div style="
     position: fixed; 
     bottom: 126px;
-    left: 8px;
     width: 229px;
-    height: 80px;
+    height: 50px;
     z-index:9999;
     font-size:14px;
     ">
@@ -43,7 +42,7 @@ legend_html = '''
     bottom: 45px;
     left: 8px;
     width: 129px;
-    height: 180px; 
+    height: 150px; 
     z-index:9998;
     font-size:14px;
     background-color: #ffffff;
