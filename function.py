@@ -336,3 +336,34 @@ def printRes(res ,plotLine=True ,plotResiduals = False, n = 10):
         
     print('Sample rows:')
     print( res.sample(n))
+    
+from lime_stability.stability import LimeTabularExplainerOvr
+def getLimeAvg(X_test_scaled,X_train_scaled,X_train,model,numRunLimeForSameIndex=20):
+  '''
+  return the avg of lime results for each index.
+  '''
+  class_names=['Israelis_Count']
+
+  categorical_features = np.argwhere(
+      np.array([len(set(X_train_scaled[:,x]))
+      for x in range(X_train_scaled.shape[1])]) <= 2).flatten()
+
+  print(X_train_scaled.shape)
+  print(categorical_features.shape)
+  print(X_train_scaled.shape)
+  explainer = LimeTabularExplainerOvr(np.array(X_train_scaled),
+  feature_names=X_train.drop('Date',axis=1).columns,
+  class_names=class_names, 
+  categorical_features=categorical_features, 
+  verbose=True,
+  mode='regression'
+  )
+  limeDF = pd.DataFrame(data={'IsVacation':[0],'Temperature':[0],'is weekend':[0],'IsHoliday':[0],'pm10':[0]}).T
+  limeDF
+  avgCount = 0
+  for i in range(0,len(X_test_scaled)) :
+      for j in range(numRunLimeForSameIndex):
+          exp = explainer.explain_instance((X_test_scaled[i]),model.predict,num_features=100)
+          limeDF += function.outputLimeAsDf(exp)
+          avgCount += 1
+  return limeDF/ avgCount
