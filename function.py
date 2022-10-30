@@ -364,6 +364,6 @@ def getLimeAvg(X_test_scaled,X_train_scaled,X_train,model,numRunLimeForSameIndex
   for i in range(0,len(X_test_scaled)) :
       for j in range(numRunLimeForSameIndex):
           exp = explainer.explain_instance((X_test_scaled[i]),model.predict,num_features=100)
-          limeDF += function.outputLimeAsDf(exp)
+          limeDF += outputLimeAsDf(exp)
           avgCount += 1
   return limeDF/ avgCount
