@@ -358,7 +358,7 @@ def getLimeAvg(X_test_scaled,X_train_scaled,X_train,model,numRunLimeForSameIndex
   verbose=True,
   mode='regression'
   )
-  limeDF = pd.DataFrame(data={'IsVacation':[0],'Temperature':[0],'is weekend':[0],'IsHoliday':[0],'pm10':[0]}).T
+  limeDF = pd.DataFrame(data={'IsVacation':[0],'Temperature':[0],'is weekend':[0],'pm10':[0]}).T
   limeDF
   avgCount = 0
   for i in range(0,len(X_test_scaled)) :
